@@ -1,0 +1,8 @@
+# Hooks opsional: jalankan `pip install pre-commit && pre-commit install` di root repo.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^backend/
