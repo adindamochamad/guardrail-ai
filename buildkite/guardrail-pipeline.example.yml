@@ -1,0 +1,20 @@
+# Contoh pipeline Buildkite — integrasi GuardRail (pemblokiran via /scan).
+# Salin ke UI Buildkite atau ke repo .buildkite/pipeline.yml sesuai konvensi tim Anda.
+#
+# Siapkan secret:
+#   GUARDRAIL_URL = https://api-anda.contoh.com   (tanpa trailing slash)
+
+steps:
+  - label: ":shield: GuardRail — scan risiko (blokir jika CRITICAL)"
+    key: guardrail-scan
+    # Pilih agent yang punya curl, jq, bash (gambar Linux umumnya sudah memenuhi).
+    commands:
+      - echo "--- Mengambil skrip GuardRail dari repo"
+      - chmod +x scripts/guardrail_ci_scan.sh
+      - export GUARDRAIL_URL="${GUARDRAIL_URL:-http://127.0.0.1:8000}"
+      # Opsional: gagal juga pada temuan HIGH — uncomment baris berikut.
+      # - export GUARDRAIL_FAIL_SEVERITY=HIGH
+      - ./scripts/guardrail_ci_scan.sh
+
+  # Langkah lain (tes, build, deploy) boleh mengandalkan key guardrail-scan atau diparalelkan
+  # sesuai kebutuhan; untuk blokir merge, set branch protection agar memerlukan langkah ini hijau.

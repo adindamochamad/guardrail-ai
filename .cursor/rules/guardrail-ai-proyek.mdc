@@ -1,0 +1,36 @@
+---
+description: Konteks GuardRail AI dan standar kerja untuk setiap sesi Cursor
+alwaysApply: true
+---
+
+# GuardRail AI — aturan proyek
+
+## Visi jangka panjang (kompas produk)
+- **Bukan sekadar demo:** target akhir adalah **platform kepercayaan** antara asisten AI dan produksi — deteksi asal → risiko → kebijakan tim → audit/compliance.
+- **Prioritas teknis:** arsitektur terawat (API jelas, modul terpisah, data **feedback** untuk perbaikan berkala), integrasi CI & runtime, penjelasan yang bisa diaudit (bukan skor “kotak hitam”).
+- **Trade-off:** pilih fondasi yang dipakai bertahun-tahun; **shortcut hackathon** hanya bila deadline memaksa, lalu catat utang dan rapikan setelah submit.
+
+## Konteks produk
+- **Tujuan:** platform guardrail untuk kode hasil AI — deteksi asal AI, analisis pola risiko, integrasi CI (Buildkite), monitoring runtime (Hud.io), dashboard.
+- **Dokumen sumber:** `README.md`, `docs/PROJECT.md`, `docs/ROADMAP.md`, `TODO.md`.
+
+## Stack (MVP)
+- Backend: Python 3.11+, FastAPI, SQLAlchemy, SQLite (dev), pytest, ruff.
+- Frontend (nanti): React, TypeScript, Tailwind (folder `frontend/`).
+
+## Prinsip kerja agent
+- Utamakan perubahan terfokus; hindari refactor besar tanpa diminta.
+- Setelah menyentuh `backend/`, **wajib** memastikan suite tes hijau (`make test` atau `pytest` dari `backend/`).
+- Jangan commit rahasia; gunakan `backend/.env` dari `.env.example`.
+
+## Konvensi kode (selaras rule bahasa Indonesia user)
+- Variabel dan parameter **baru** di Python: **bahasa Indonesia**, `snake_case`.
+- Komentar **baru**: **bahasa Indonesia**, menjelaskan *mengapa* / batasan, bukan mengulang sintaks.
+- Nama model/API publik (mis. kolom REST) boleh tetap konvensional Inggris jika sudah dipakai konsisten di seluruh API.
+
+## Struktur backend
+- Entry: `backend/src/main.py` (`uvicorn src.main:app`).
+- Konfigurasi: `backend/src/config.py`. Penyimpanan: `backend/src/database.py`, `backend/src/models.py`.
+- Deteksi AI: `backend/src/ai_detector/`. Analisis risiko: `backend/src/analisis_risiko/`. Route: `backend/src/routes/`.
+- Buildkite (Day 4): `backend/src/integrasi_buildkite/`, rute `routes/buildkite_webhook.py`.
+- Observabilitas runtime (Day 5): `backend/src/observabilitas/` (Sentry opsional; Hud.io bila tersedia).

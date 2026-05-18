@@ -68,6 +68,28 @@ class PengaturanAplikasi(BaseSettings):
         le=50,
         validation_alias="BUILDKITE_GIT_DEPTH",
     )
+    # --- Observabilitas runtime (Sentry; Day 5 — alternatif Hud.io) ---
+    dsn_sentry: str | None = Field(
+        default=None,
+        validation_alias="SENTRY_DSN",
+        description="Jika diisi, error & trace dikirim ke Sentry (FastAPI).",
+    )
+    lingkungan_sentry: str = Field(
+        default="development",
+        validation_alias="SENTRY_ENVIRONMENT",
+    )
+    rasio_sampel_trace_sentry: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=1.0,
+        validation_alias="SENTRY_TRACES_SAMPLE_RATE",
+        description="0 = hanya error; naikkan untuk performance monitoring (biaya kuota).",
+    )
+    aktifkan_rute_debug_sentry: bool = Field(
+        default=False,
+        validation_alias="SENTRY_DEBUG_ROUTE",
+        description="Jika true + DSN ada, mendaftarkan GET /sentry-debug (hanya untuk dev).",
+    )
 
 
 @lru_cache

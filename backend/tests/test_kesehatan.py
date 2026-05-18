@@ -7,6 +7,7 @@ def test_health_mengembalikan_ok(klien_api):
     isi = balasan.json()
     assert isi["status"] == "ok"
     assert isi["service"] == "GuardRail AI"
+    assert isi.get("observabilitas_runtime") in ("tidak_aktif", "sentry")
 
 
 def test_db_ping_awal_bernomor_nol(klien_api):

@@ -1,4 +1,4 @@
-# Backend GuardRail AI (Day 1–4)
+# Backend GuardRail AI (Day 1–5)
 
 ## Prasyarat
 
@@ -43,6 +43,7 @@ uvicorn src.main:app --reload
 1. Set `BUILDKITE_WEBHOOK_TOKEN` (dan untuk anotasi: `BUILDKITE_API_TOKEN`; opsional `BUILDKITE_ORG_SLUG`).
 2. Di Buildkite, tambahkan **Notification Service** → **Webhook** menuju `https://<host-anda>/webhooks/buildkite`.
 3. Untuk dev lokal tanpa token, **jangan** dipakai di produksi: `BUILDKITE_WEBHOOK_ALLOW_UNVERIFIED=true`.
+4. **Memblokir build** pada temuan CRITICAL: langkah pipeline memanggil `/scan` — lihat [`docs/BUILDKITE_PIPELINE.md`](../docs/BUILDKITE_PIPELINE.md) dan `scripts/guardrail_ci_scan.sh`.
 
 ## Tes & lint
 
@@ -61,3 +62,4 @@ Atau dari root repo: `make test`, `make lint`.
 - Modul deteksi: `src/ai_detector/` — pola statis (21+), metadata commit, OpenAI opsional.
 - Modul analisis: `src/analisis_risiko/` — ≥30 aturan regex + pemeriksaan AST Python.
 - Integrasi Buildkite: `src/integrasi_buildkite/` — verifikasi webhook, pemindaian, klien anotasi REST.
+- Observabilitas runtime: `src/observabilitas/` — Sentry opsional (substitusi praktis saat Hud.io tidak tersedia) — lihat [`docs/OBSERVABILITAS_RUNTIME.md`](../docs/OBSERVABILITAS_RUNTIME.md).

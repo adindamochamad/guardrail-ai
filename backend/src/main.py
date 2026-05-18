@@ -1,4 +1,4 @@
-"""Aplikasi FastAPI GuardRail AI — Day 1–4: deteksi, analisis, Buildkite webhook."""
+"""Aplikasi FastAPI GuardRail AI — Day 1–5: deteksi, analisis, Buildkite, observabilitas runtime."""
 
 from contextlib import asynccontextmanager
 from typing import Annotated
@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from .config import dapatkan_pengaturan
 from .database import BasisModel, dapatkan_sesi_db, mesin_database
 from .models import CodeFile, Scan  # noqa: F401 — memastikan metadata ORM terdaftar
+from .observabilitas import pasang_observabilitas_runtime, ringkas_status_observabilitas
 from .routes import analisis_risiko as rute_analisis
 from .routes import buildkite_webhook as rute_buildkite
 from .routes import deteksi as rute_deteksi
@@ -20,6 +21,7 @@ async def lifespan(_app: FastAPI):
     """Buat skema tabel saat startup (MVP dev; produksi pakai migrasi terpisah)."""
 
     BasisModel.metadata.create_all(bind=mesin_database)
+    pasang_observabilitas_runtime(dapatkan_pengaturan())
     yield
 
 
@@ -27,13 +29,26 @@ pengaturan_aplikasi = dapatkan_pengaturan()
 
 app = FastAPI(
     title=pengaturan_aplikasi.nama_aplikasi,
-    version="0.4.0",
+    version="0.5.0",
     lifespan=lifespan,
 )
 
 app.include_router(rute_deteksi.router)
 app.include_router(rute_analisis.router)
 app.include_router(rute_buildkite.router)
+
+# Hanya untuk verifikasi Sentry di lokal; matikan di produksi.
+_pakai_rute_debug_sentry = (
+    (pengaturan_aplikasi.dsn_sentry or "").strip() != ""
+    and pengaturan_aplikasi.aktifkan_rute_debug_sentry
+)
+if _pakai_rute_debug_sentry:
+
+    @app.get("/sentry-debug", tags=["kesehatan"], include_in_schema=False)
+    async def picu_error_uji_sentry() -> None:
+        """Sengaja gagal agar satu event error terkirim ke Sentry (hanya dev)."""
+
+        raise ZeroDivisionError("uji integrasi sentry")
 
 
 @app.get("/health", tags=["kesehatan"])
@@ -43,6 +58,7 @@ def baca_kesehatan() -> dict[str, str]:
     return {
         "status": "ok",
         "service": pengaturan_aplikasi.nama_aplikasi,
+        "observabilitas_runtime": ringkas_status_observabilitas(pengaturan_aplikasi),
     }
 
 

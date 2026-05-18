@@ -1,0 +1,21 @@
+---
+description: Pola FastAPI/SQLAlchemy dan tes untuk backend GuardRail
+alwaysApply: true
+---
+
+# Backend GuardRail — pola teknis
+
+## Tes
+- Tambah/ubah tes di `backend/tests/`. Gunakan `httpx.AsyncClient` atau `TestClient` untuk endpoint.
+- Database tes: gunakan SQLite `:memory:` atau file sementara; jangan mengandalkan `guardrail.db` produksi lokal.
+
+## API
+- Endpoint kesehatan: `GET /health` — jangan dihapus; digunakan smoke check dan CI.
+- Dependencies DB: injeksikan lewat FastAPI `Depends`; hindari singleton sesi global di handler.
+
+## SQLAlchemy
+- Satu `Base` declarative; metadata konsisten untuk `create_all` di lifespan dev.
+- Foreign key dengan `ondelete` yang eksplisit bila relasi kritis; cascade sesuai kebutuhan hackathon MVP.
+
+## Lint
+- Jalankan `ruff check src tests` dari folder `backend/` sebelum menganggap tugas selesai.

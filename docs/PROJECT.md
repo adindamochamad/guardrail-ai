@@ -1,0 +1,642 @@
+# GuardRail AI - Project Technical Documentation
+
+## 🎯 Project Overview
+
+**Name**: GuardRail AI
+**Tagline**: "Safety Guardrails for AI-Generated Code"
+**Type**: Developer tool, CI/CD security, AI safety platform
+
+**One-liner:**
+"GuardRail AI provides automated quality gates specifically designed for AI-generated code, catching risks before they reach production."
+
+---
+
+## 🧠 Core Concept
+
+### The Problem
+
+**Statistics:**
+- 70% of developers now use AI coding assistants (Cursor, GitHub Copilot, etc.)
+- 65% ship AI-generated code to production without proper review
+- AI-generated code 3x more likely to contain security vulnerabilities
+- Traditional code review tools not designed for AI code patterns
+
+**Real-world pain points:**
+1. **AI hallucinations in code**: AI generates plausible-looking but buggy code
+2. **Security blind spots**: AI copies vulnerable patterns from training data
+3. **No AI-specific checks**: Existing tools (Snyk, SonarQube) don't understand AI code
+4. **False confidence**: Developers trust AI output too much
+5. **Production incidents**: AI bugs escaping to production
+
+**Impact:**
+- Average cost of production bug: $5,000-50,000
+- Security breach from AI code: $100,000-1M+
+- Developer time debugging AI mistakes: 20% of workweek
+
+---
+
+## 💡 The Solution
+
+**GuardRail AI** is a specialized security and quality platform that:
+
+1. **Detects AI-generated code** (vs human-written)
+2. **Applies AI-specific security rules** (different from generic code)
+3. **Blocks risky code in CI/CD** (before merge)
+4. **Monitors AI code in production** (runtime safety)
+5. **Provides actionable recommendations** (how to fix)
+
+**Key differentiator:** First tool specifically designed for AI-generated code safety.
+
+---
+
+## 🏗️ Architecture
+
+### High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Developer Workflow                       │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  AI Coding Assistant (Cursor, Copilot, etc.)                │
+│  generates code →                                            │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    GuardRail AI Core                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │ AI Detection │→ │ Risk Analysis│→ │ Report Gen   │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                 ┌────────────┼────────────┐
+                 ▼            ▼            ▼
+         ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+         │   CI/CD     │ │   Runtime   │ │  Dashboard  │
+         │ (Buildkite) │ │  (Hud.io)   │ │  (Web UI)   │
+         └─────────────┘ └─────────────┘ └─────────────┘
+```
+
+---
+
+## 🔧 Technical Stack
+
+### Backend
+- **Language**: Python 3.11+
+- **Framework**: FastAPI (async, high performance)
+- **AI Detection**: LangChain + OpenAI API
+- **Static Analysis**: AST parsing, regex patterns
+- **Database**: SQLite (dev), PostgreSQL (production)
+
+### Integrations
+- **Hud.io SDK**: Runtime monitoring (pip install hud-sdk)
+- **Buildkite API**: CI/CD integration (REST API v2)
+- **OpenAI API**: Code analysis & classification
+- **Jellyfish API**: Engineering metrics (optional)
+
+### Frontend
+- **Framework**: React + TypeScript
+- **Styling**: TailwindCSS
+- **Charts**: Recharts
+- **State**: Zustand (lightweight)
+
+### DevOps
+- **Containerization**: Docker
+- **Testing**: pytest + pytest-cov
+- **Linting**: ruff (fast Python linter)
+- **CI/CD**: GitHub Actions + Buildkite
+
+---
+
+## 🎯 Core Features (MVP)
+
+### 1. AI Code Detection Engine
+
+**Goal**: Identify which code was generated by AI vs human-written
+
+**Method:**
+```python
+def detect_ai_code(code: str, metadata: dict) -> AICodeResult:
+    """
+    Multi-signal detection:
+    1. Git commit metadata (Copilot marker)
+    2. Code pattern analysis (AI signatures)
+    3. LLM classification (GPT-4 as judge)
+    """
+    signals = [
+        check_commit_metadata(metadata),  # "Co-authored-by: GitHub Copilot"
+        analyze_code_patterns(code),       # AI writing style patterns
+        classify_with_llm(code)            # GPT-4 confidence score
+    ]
+    
+    return aggregate_signals(signals)
+```
+
+**Accuracy target**: 85%+ precision, 90%+ recall
+
+---
+
+### 2. AI-Specific Risk Analysis
+
+**Categories of risks:**
+
+#### a) Security Vulnerabilities
+- SQL injection (AI loves string concatenation)
+- Hardcoded secrets (AI copies from examples)
+- Command injection (AI uses os.system() too much)
+- Path traversal (AI doesn't sanitize paths)
+- XSS vulnerabilities (AI forgets escaping)
+
+#### b) Logic Errors
+- Incorrect error handling (AI assumes happy path)
+- Race conditions (AI doesn't think concurrency)
+- Null/undefined handling (AI forgets edge cases)
+- Off-by-one errors (AI bad at boundary conditions)
+
+#### c) Performance Issues
+- N+1 queries (AI doesn't optimize DB calls)
+- Memory leaks (AI forgets cleanup)
+- Inefficient algorithms (AI picks O(n²) over O(n))
+
+#### d) Compliance Issues
+- Privacy violations (AI logs sensitive data)
+- License violations (AI copies GPL code)
+- Regulatory issues (AI doesn't know HIPAA/GDPR)
+
+**Detection engine:**
+```python
+RISK_RULES = [
+    {
+        "id": "SQL_INJECTION_001",
+        "pattern": r'f"SELECT \* FROM .* WHERE .* = {.*}"',
+        "severity": "CRITICAL",
+        "ai_specific": True,
+        "description": "AI-generated SQL query without parameterization"
+    },
+    {
+        "id": "HARDCODED_SECRET_001",
+        "pattern": r'(api_key|password|secret) = ["\'][\w]{20,}["\']',
+        "severity": "HIGH",
+        "ai_specific": True,
+        "description": "Hardcoded secret from AI training data"
+    },
+    # ... 50+ rules total
+]
+```
+
+---
+
+### 3. CI/CD Integration (Buildkite)
+
+**Workflow:**
+```yaml
+# buildkite pipeline
+steps:
+  - label: "🛡️ GuardRail AI Check"
+    command: |
+      pip install guardrail-ai
+      guardrail check --ai-only --block-on-critical
+    
+    # If critical risks found → block merge
+    # If medium risks → warn but allow
+    # If low risks → informational only
+```
+
+**Buildkite integration:**
+- Webhook trigger on pull request
+- Automatic code scan
+- Comment on PR with results
+- Block merge if critical risks
+- Update check status
+
+---
+
+### 4. Runtime Monitoring (Hud.io)
+
+**Goal**: Monitor AI-generated code behavior in production
+
+**Implementation:**
+```python
+from hud_sdk import hud
+
+@hud.track()  # Hud.io automatic instrumentation
+def process_payment(amount: float, user_id: int):
+    # AI-generated code runs here
+    # Hud.io tracks: latency, errors, exceptions
+    pass
+
+# GuardRail AI correlates Hud.io data with AI code origins
+```
+
+**Metrics tracked:**
+- Error rate (AI code vs human code)
+- Performance (latency, throughput)
+- Exception types (what fails in AI code?)
+- Rollback rate (how often AI code reverted?)
+
+**Dashboard view:**
+```
+AI Code Health Score: 87/100
+
+Metrics (last 7 days):
+- Error rate: 2.3% (AI) vs 1.1% (human) → 🔴 2.1x higher
+- Avg latency: 145ms (AI) vs 132ms (human) → 🟡 1.1x slower
+- Exception rate: 0.8% (AI) vs 0.3% (human) → 🔴 2.7x higher
+
+Top Issues:
+1. SQL injection attempt caught (12 times)
+2. Null pointer exception (8 times)
+3. Memory leak in AI loop (3 times)
+```
+
+---
+
+### 5. Developer Dashboard
+
+**Pages:**
+
+1. **Overview Dashboard**
+   - AI code vs human code ratio
+   - Risk distribution (critical, high, medium, low)
+   - Recent scans summary
+   - Buildkite pipeline status
+
+2. **Code Analysis**
+   - File-by-file breakdown
+   - Risk details per line
+   - Fix recommendations
+   - Historical trends
+
+3. **CI/CD Integration**
+   - Buildkite pipelines list
+   - Scan results per build
+   - Block/allow decisions log
+
+4. **Runtime Monitoring**
+   - Hud.io metrics visualization
+   - AI code performance trends
+   - Production incidents correlation
+
+5. **Settings**
+   - Configure risk thresholds
+   - Buildkite webhook setup
+   - Hud.io API key configuration
+
+---
+
+## 🔬 Technical Implementation Details
+
+### AI Code Detection Algorithm
+
+**Multi-signal approach:**
+
+```python
+class AICodeDetector:
+    def __init__(self):
+        self.llm = OpenAI(model="gpt-4o-mini")  # Fast & cheap
+        self.pattern_matcher = PatternMatcher()
+    
+    def detect(self, code: str, file_path: str, git_metadata: dict) -> float:
+        """
+        Returns: confidence score 0.0-1.0 that code is AI-generated
+        """
+        signals = []
+        
+        # Signal 1: Git commit metadata (90% accurate when present)
+        if "Co-authored-by: GitHub Copilot" in git_metadata.get("message", ""):
+            signals.append(("git_metadata", 0.95))
+        
+        # Signal 2: Code pattern analysis (70% accurate)
+        patterns_score = self.pattern_matcher.analyze(code)
+        signals.append(("patterns", patterns_score))
+        
+        # Signal 3: LLM classification (85% accurate, but slow/expensive)
+        if len(signals) < 2 or max(s[1] for s in signals) < 0.7:
+            llm_score = self.llm_classify(code)
+            signals.append(("llm", llm_score))
+        
+        # Weighted average
+        return self.aggregate(signals)
+    
+    def llm_classify(self, code: str) -> float:
+        """Use GPT-4 to classify if code looks AI-generated"""
+        prompt = f"""
+        Analyze this code and estimate probability (0.0-1.0) it was AI-generated.
+        
+        AI code indicators:
+        - Overly verbose comments
+        - Unusual formatting
+        - Generic variable names (item, data, result)
+        - Try-except wrapping everything
+        - Follows template patterns
+        
+        Code:
+        {code}
+        
+        Return only a float between 0.0 and 1.0.
+        """
+        response = self.llm.complete(prompt)
+        return float(response.strip())
+```
+
+**Pattern signatures** (AI writing style):
+```python
+AI_PATTERNS = [
+    # AI loves these variable names
+    r'\b(item|data|result|response|output|value)\b',
+    
+    # AI wraps everything in try-except
+    r'try:\n.*\nexcept Exception as e:\n.*pass',
+    
+    # AI uses generic function names
+    r'def (process|handle|execute|perform)_.*\(',
+    
+    # AI adds excessive comments
+    r'#.*\n.*#.*\n.*#.*',  # 3+ consecutive comment lines
+    
+    # AI formatting quirks
+    r'    # .*\n    ',  # Comment indent exactly 4 spaces
+]
+```
+
+---
+
+### Risk Analysis Engine
+
+```python
+class RiskAnalyzer:
+    def __init__(self):
+        self.rules = load_risk_rules()  # 50+ predefined rules
+        self.severity_weights = {
+            "CRITICAL": 10,
+            "HIGH": 5,
+            "MEDIUM": 2,
+            "LOW": 1
+        }
+    
+    def analyze(self, code: str, is_ai: bool) -> List[Risk]:
+        """
+        Analyze code for security & quality risks
+        
+        If is_ai=True, apply AI-specific rules with higher sensitivity
+        """
+        risks = []
+        
+        # Static analysis
+        ast_tree = ast.parse(code)
+        risks.extend(self.analyze_ast(ast_tree, is_ai))
+        
+        # Pattern matching
+        for rule in self.rules:
+            if not is_ai and rule.get("ai_specific"):
+                continue  # Skip AI-specific rules for human code
+            
+            matches = re.finditer(rule["pattern"], code)
+            for match in matches:
+                risks.append(Risk(
+                    rule_id=rule["id"],
+                    severity=rule["severity"],
+                    line=code[:match.start()].count('\n') + 1,
+                    description=rule["description"],
+                    fix_suggestion=rule.get("fix")
+                ))
+        
+        # LLM-based semantic analysis (for complex issues)
+        if any(r.severity == "CRITICAL" for r in risks):
+            semantic_risks = self.llm_analyze_context(code, risks)
+            risks.extend(semantic_risks)
+        
+        return sorted(risks, key=lambda r: self.severity_weights[r.severity], reverse=True)
+```
+
+---
+
+### Buildkite Integration
+
+```python
+class BuildkiteIntegration:
+    def __init__(self, api_token: str, org_slug: str):
+        self.client = BuildkiteAPI(api_token)
+        self.org_slug = org_slug
+    
+    def setup_webhook(self, pipeline_slug: str, guardrail_url: str):
+        """Setup webhook to trigger GuardRail on every build"""
+        self.client.webhooks.create(
+            org=self.org_slug,
+            pipeline=pipeline_slug,
+            url=f"{guardrail_url}/webhooks/buildkite",
+            events=["build.started", "build.finished"]
+        )
+    
+    async def on_build_started(self, build_data: dict):
+        """Webhook handler: scan code when build starts"""
+        repo_url = build_data["repository"]["url"]
+        commit = build_data["commit"]
+        
+        # Clone repo at commit
+        code_files = await self.fetch_code(repo_url, commit)
+        
+        # Scan all files
+        scan_results = []
+        for file in code_files:
+            result = await self.scan_file(file)
+            scan_results.append(result)
+        
+        # Post results back to Buildkite
+        await self.post_results(build_data["id"], scan_results)
+        
+        # Block build if critical risks found
+        if any(r.severity == "CRITICAL" for r in scan_results):
+            await self.block_build(build_data["id"])
+    
+    async def post_results(self, build_id: str, results: List[ScanResult]):
+        """Post scan results as Buildkite annotation"""
+        markdown = self.format_results_markdown(results)
+        
+        self.client.annotations.create(
+            org=self.org_slug,
+            build=build_id,
+            body=markdown,
+            style="error" if any(r.critical for r in results) else "warning"
+        )
+```
+
+---
+
+### Hud.io Integration
+
+```python
+from hud_sdk import hud
+
+# Initialize Hud.io
+hud.configure(
+    api_key=os.environ["HUD_API_KEY"],
+    service_name="guardrail-demo-app",
+    environment="production"
+)
+
+# Automatic instrumentation (zero code changes)
+@hud.track()
+def ai_generated_function(data: dict) -> dict:
+    # This function was generated by AI
+    # Hud.io automatically tracks:
+    # - Execution time
+    # - Exceptions
+    # - Return values
+    # - Call frequency
+    result = process_data(data)
+    return result
+
+# GuardRail correlates Hud.io metrics with AI code
+class HudIntegration:
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+    
+    def fetch_metrics(self, function_name: str, timeframe: str) -> dict:
+        """Fetch Hud.io metrics for specific function"""
+        response = requests.get(
+            f"https://api.hud.io/v1/metrics/functions/{function_name}",
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            params={"timeframe": timeframe}
+        )
+        return response.json()
+    
+    def compare_ai_vs_human(self) -> dict:
+        """Compare performance of AI code vs human code"""
+        ai_functions = self.get_ai_functions()  # From GuardRail DB
+        human_functions = self.get_human_functions()
+        
+        ai_metrics = [self.fetch_metrics(f) for f in ai_functions]
+        human_metrics = [self.fetch_metrics(f) for f in human_functions]
+        
+        return {
+            "ai": self.aggregate_metrics(ai_metrics),
+            "human": self.aggregate_metrics(human_metrics),
+            "ratio": self.calculate_ratio(ai_metrics, human_metrics)
+        }
+```
+
+---
+
+## 📊 Success Metrics
+
+### Technical Metrics
+
+**Detection accuracy:**
+- AI code detection: 85%+ precision, 90%+ recall
+- Risk detection: 80%+ accuracy on known vulnerabilities
+- False positive rate: < 15%
+
+**Performance:**
+- Scan speed: < 5 seconds per 1000 lines of code
+- API response time: < 500ms (p95)
+- CI/CD overhead: < 30 seconds added to build time
+
+**Coverage:**
+- Support: Python, JavaScript/TypeScript, Go (MVP)
+- Vulnerability database: 50+ AI-specific rules
+- Integration: Buildkite, GitHub Actions, GitLab CI
+
+### Business Metrics
+
+**Target market:**
+- Total Addressable Market (TAM): 50M developers worldwide
+- AI adoption rate: 30% (15M potential users)
+- Paid conversion: 5% (750K potential customers)
+- Revenue potential: $49/month × 750K = $36.75M/month
+
+**Go-to-market:**
+- Phase 1: Free tier (1,000 monthly scans)
+- Phase 2: Pro tier ($49/month unlimited)
+- Phase 3: Enterprise tier ($499/month + SSO, compliance)
+
+**Comparable companies:**
+- Snyk: $8.5B valuation, $100M ARR
+- GitGuardian: $200M valuation, $20M ARR
+- **GuardRail AI positioning**: "Snyk for AI Code"
+
+---
+
+---
+
+## 🧭 Visi jangka panjang (komitmen pemilik)
+
+Proyek ini **dijalankan dengan horizon jangka panjang**, bukan hanya sampai MVP hackathon. Arah yang dipilih:
+
+1. **Platform governansi kode berbantuan AI** — alur dari PR/IDE hingga produksi: kebijakan per repo/tim, pengecualian bermutasi, dan jejak keputusan untuk audit.
+2. **Peningkatan berbasis data** — kumpulan label/feedback developer memperkaya aturan dan (bertahap) model; metrik akurasi disajikan secara transparan.
+3. **Menyatu di ekosistem** — CI/CD (Buildkite dan sejenis), monitoring runtime (Hud.io-class), repositori Git, dan kebutuhan enterprise (SSO, retensi data, compliance).
+4. **Positioning** — *trust layer* untuk kode hasil/mix AI dan manusia; **bukan** pengganti review manusia dan **bukan** alat “bukti hukum” otomatis.
+
+**Prinsip keputusan:** jika ada pilihan antara jalan cepat yang mematikan ekstensibilitas (API monolit tanpa versi, logika tak teruji) versus investasi kecil pada abstraksi dan tes — **pilih yang memungkinkan produk hidup setelah hackathon**, kecuali milestone demo menuntut pengecualian eksplisit yang tercatat di `TODO.md`.
+
+## 🚀 Future Roadmap (Post-Hackathon)
+
+### Phase 1 (Month 1-3)
+- [ ] Support more languages (Java, C++, Ruby)
+- [ ] GitHub App integration (easier setup)
+- [ ] VS Code extension (IDE integration)
+- [ ] Slack notifications (real-time alerts)
+
+### Phase 2 (Month 4-6)
+- [ ] Custom rule builder (let users define rules)
+- [ ] AI-powered fix suggestions (auto-fix vulnerabilities)
+- [ ] Team dashboard (multi-user support)
+- [ ] Compliance reports (SOC2, ISO 27001)
+
+### Phase 3 (Month 7-12)
+- [ ] Enterprise features (SSO, SAML, audit logs)
+- [ ] API for programmatic access
+- [ ] Terraform/CloudFormation templates
+- [ ] White-label solution for large customers
+
+### Phase 4 (Year 2)
+- [ ] AI code generation WITH guardrails (built-in safety)
+- [ ] IDE plugin that blocks risky AI suggestions in real-time
+- [ ] Marketplace for community-contributed rules
+- [ ] ML model to learn from user feedback (reduce false positives)
+
+---
+
+## 🏁 MVP Success Criteria (For Hackathon)
+
+### Must Have (to submit)
+- [x] AI code detection working (85%+ accuracy)
+- [ ] At least 20 risk detection rules implemented
+- [ ] Buildkite integration functional (webhook + API)
+- [ ] Hud.io integration functional (SDK + metrics fetch)
+- [ ] Basic dashboard showing results
+- [ ] Demo video (2-3 minutes)
+- [ ] Complete Devpost submission
+
+### Nice to Have (if time permits)
+- [ ] Jellyfish integration (engineering metrics)
+- [ ] GitHub Actions support (in addition to Buildkite)
+- [ ] CLI tool (standalone usage without CI/CD)
+- [ ] Real-time monitoring dashboard
+- [ ] Email/Slack notifications
+
+### Demo Scenarios (for video)
+1. **Scenario 1**: Copilot generates SQL injection vulnerability
+   - Show: Code in editor with Copilot suggestion
+   - Run: GuardRail analysis
+   - Result: Critical risk detected + blocked in CI
+
+2. **Scenario 2**: AI code causes production error
+   - Show: Hud.io metrics spike (error rate increase)
+   - Correlate: GuardRail identifies AI-generated function
+   - Result: Root cause identified quickly
+
+3. **Scenario 3**: Team metrics comparison
+   - Show: Dashboard comparing AI vs human code quality
+   - Metrics: Error rate, performance, security score
+   - Result: Data-driven decision on AI adoption
+
+---
+
+**Document created**: 17 Mei 2026
+**Last updated**: 17 Mei 2026
+**Status**: Active development

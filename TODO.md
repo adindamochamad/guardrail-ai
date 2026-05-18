@@ -3,13 +3,16 @@
 ## 🎯 Hari ini — Day 5 (21 Mei 2026)
 
 ### 🔄 Fokus berikutnya (Day 5)
-- [ ] Integrasi Hud.io / metrik perbandingan (sesuai roadmap)
+- [ ] Metrik perbandingan AI vs manusia & demo deployment (opsional; Hud.io waitlist — pakai Sentry + dashboard sendiri)
+
+### ✅ Selesai — Day 5 (parsial)
+- [x] Observabilitas runtime lewat **Sentry** (`src/observabilitas/`), env & `GET /health` + docs [`OBSERVABILITAS_RUNTIME.md`](docs/OBSERVABILITAS_RUNTIME.md); app **v0.5.0**
 
 ### ✅ Selesai — Day 4 (20 Mei 2026)
 - [x] Webhook `POST /webhooks/buildkite` — verifikasi token / HMAC, pemindaian, anotasi API opsional
 - [x] Modul `src/integrasi_buildkite/` — klien anotasi, orkestrator, opsi git clone ringkas
-- [x] Konfigurasi env Buildkite; tes + `docs/API.md`; app `v0.4.0`
-- [ ] Dokumentasi ambang blokir CRITICAL di pipeline Buildkite (langkah `guardrail` dengan exit non-zero)
+- [x] Konfigurasi env Buildkite; tes + `docs/API.md`; app **v0.4.0** (kini **v0.5.0** dengan Sentry)
+- [x] Dokumentasi ambang blokir CRITICAL di pipeline Buildkite (langkah `guardrail` dengan exit non-zero)
 
 ### ✅ Selesai — Day 3 (19 Mei 2026)
 - [x] Paket `src/analisis_risiko/` — **≥30 aturan regex** + **11 pemeriksaan AST** Python
@@ -57,13 +60,13 @@
 - [x] Buildkite REST: anotasi build (`kirim_anotasi_build`)
 - [x] Webhook handler (`/webhooks/buildkite`)
 - [x] Code fetching (git clone ringkas opsional, `BUILDKITE_WEBHOOK_GIT_CLONE`)
-- [ ] Blokir build terpusat lewat langkah pipeline + dokumentasi (bukan hanya anotasi)
+- [x] Blokir build terpusat lewat langkah pipeline + dokumentasi (bukan hanya anotasi)
 
-### Day 5 - Hud.io Integration
-- [ ] Hud.io SDK setup
-- [ ] Metrics collection
-- [ ] AI vs Human comparison
-- [ ] Demo app deployment
+### Day 5 - Runtime observability (Hud.io waitlist → Sentry)
+- [x] SDK observabilitas: Sentry + fasad `observabilitas/`
+- [x] Koleksi error (dan trace opsional) lewat `SENTRY_*`
+- [ ] Perbandingan AI vs manusia terukur (butuh produk / dataset — lanjut jika ada waktu)
+- [ ] Deploy demo publik (Railway, Fly.io, dsb.)
 
 ### Day 6 - Dashboard Frontend
 - [ ] React app setup

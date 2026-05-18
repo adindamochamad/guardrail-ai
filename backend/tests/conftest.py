@@ -4,6 +4,9 @@ import os
 
 # Wajib dijalankan sebelum import `src.*` agar singleton engine menunjuk SQLite memori.
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+# Matikan Sentry saat tes: tidak mengirim event ke dashboard & tidak menahan proses saat flush.
+os.environ["SENTRY_DSN"] = ""
+os.environ["SENTRY_DEBUG_ROUTE"] = "false"
 
 import pytest
 from fastapi.testclient import TestClient

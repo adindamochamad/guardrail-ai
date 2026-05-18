@@ -43,6 +43,10 @@ def buat_pengaturan_uji(**nilai_timpa: object) -> PengaturanAplikasi:
         "slug_organisasi_buildkite": None,
         "webhook_klon_git_otomatis": False,
         "kedalaman_klon_git": 1,
+        "dsn_sentry": None,
+        "lingkungan_sentry": "development",
+        "rasio_sampel_trace_sentry": 0.0,
+        "aktifkan_rute_debug_sentry": False,
     }
     dasar.update(nilai_timpa)
     return PengaturanUjiAplikasi(**dasar)
