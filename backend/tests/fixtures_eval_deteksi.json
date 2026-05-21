@@ -1,0 +1,43 @@
+[
+  {
+    "id": "ai_copilot_trailer",
+    "label_apakah_ai": true,
+    "kode": "def tambah(a, b):\n    return a + b\n",
+    "pesan_commit": "fix\n\nCo-authored-by: GitHub Copilot <copilot@users.noreply.github.com>"
+  },
+  {
+    "id": "ai_pola_placeholder",
+    "label_apakah_ai": true,
+    "kode": "# TODO: implementasi fungsi berikut\n# FIXME: refactor block ini\ndef handler():\n    pass  # placeholder\n"
+  },
+  {
+    "id": "ai_docstring_panjang",
+    "label_apakah_ai": true,
+    "kode": "def proses(data):\n    \"\"\"\n    Memproses data input dan mengembalikan hasil terstruktur.\n    Args:\n        data: struktur masukan.\n    Returns:\n        dict hasil normalisasi.\n    \"\"\"\n    return {\"ok\": True}\n"
+  },
+  {
+    "id": "manusia_minimal",
+    "label_apakah_ai": false,
+    "kode": "def f(x):\n    return x + 1\n"
+  },
+  {
+    "id": "manusia_legacy",
+    "label_apakah_ai": false,
+    "kode": "import os\n\ndef baca_cfg():\n    with open('/etc/app.cfg') as f:\n        return f.read()\n"
+  },
+  {
+    "id": "manusia_komentar_singkat",
+    "label_apakah_ai": false,
+    "kode": "# hotfix prod\ndef patch():\n    return 42\n"
+  },
+  {
+    "id": "ai_type_hints_berlebihan",
+    "label_apakah_ai": true,
+    "kode": "from typing import Optional, List, Dict, Any\n\ndef transform(items: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:\n    \"\"\"Transform items.\"\"\"\n    if not items:\n        return None\n    return {\"count\": len(items)}\n"
+  },
+  {
+    "id": "borderline_manusia",
+    "label_apakah_ai": false,
+    "kode": "class Repo:\n    def __init__(self, path):\n        self.path = path\n    def load(self):\n        raise NotImplementedError\n"
+  }
+]

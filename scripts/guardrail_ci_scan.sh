@@ -2,6 +2,10 @@
 # Menggabungkan berkas .py terlacak Git, memanggil POST /scan, lalu gagal bila melewati ambang keparahan.
 set -euo pipefail
 
+akar_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Hindari gagal `dubious ownership` saat repo dimiliki user lain (umum di VPS).
+perintah_git=(git -c "safe.directory=${akar_repo}")
+
 url_guardrail="${GUARDRAIL_URL:-http://127.0.0.1:8000}"
 url_guardrail="${url_guardrail%/}"
 ambang_gagal="${GUARDRAIL_FAIL_SEVERITY:-CRITICAL}"
@@ -17,7 +21,7 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 2
 fi
 
-if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if ! "${perintah_git[@]}" -C "${akar_repo}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "guardrail_ci_scan: jalankan di dalam repositori Git." >&2
   exit 2
 fi
@@ -36,7 +40,7 @@ while IFS= read -r jalan_berkas; do
     break
   fi
   kumpulan_kode+="$fragmen"
-done < <(git ls-files '*.py' | grep -vE '(^|/)(venv|\.venv|node_modules)/' || true)
+done < <("${perintah_git[@]}" -C "${akar_repo}" ls-files '*.py' | grep -vE '(^|/)(venv|\.venv|node_modules)/' || true)
 
 if [ -z "${kumpulan_kode//[[:space:]]/}" ]; then
   echo "guardrail_ci_scan: tidak ada berkas .py terlacak untuk dipindai." >&2

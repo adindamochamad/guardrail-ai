@@ -64,21 +64,21 @@ Developer → AI Assistant → Code Generated
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+ (for frontend)
-- OpenAI API key
-- Hud.io account (free tier)
-- Buildkite account (optional)
+- OpenAI API key (optional, for LLM detection)
+- Buildkite account (optional, for CI demo)
+- Sentry DSN (optional, production observability)
 
 ### Installation
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/guardrail-ai.git
+git clone https://github.com/adindamochamad/guardrail-ai.git
 cd guardrail-ai
 
 # Backend setup
 cd backend
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 # Environment variables
@@ -88,10 +88,9 @@ cp .env.example .env
 # Run backend
 uvicorn src.main:app --reload
 
-# Frontend setup (in new terminal) — coming soon
-# cd frontend
-# npm install
-# npm run dev
+# Frontend (terminal baru)
+cd frontend && npm install && npm run dev
+# Build produksi: npm run build  → folder dist/
 ```
 
 **Dari root repo:** `make install`, `make test`, `make lint`, `make run-backend` (lihat [backend/README.md](backend/README.md)).
@@ -112,12 +111,12 @@ print(f"Risks found: {len(result.risks)}")
 ## 🎯 Features
 
 ### ✅ AI Code Detection
-- Multi-signal detection (git metadata + patterns + LLM)
-- 85%+ precision, 90%+ recall
+- Multi-signal detection (git metadata + patterns + optional LLM)
+- Mini evaluation set — see [`docs/HASIL_EVAL_DETEKSI.md`](docs/HASIL_EVAL_DETEKSI.md) (heuristic, no overclaim)
 - Support: Python, JavaScript, TypeScript
 
 ### ✅ Risk Analysis
-- 50+ security & quality rules
+- 30+ regex rules + Python AST checks (see API `/scan`)
 - AI-specific vulnerability patterns
 - Severity scoring (Critical, High, Medium, Low)
 - Line-level error highlighting
@@ -128,11 +127,9 @@ print(f"Risks found: {len(result.risks)}")
 - PR comments with detailed results
 - Custom risk thresholds
 
-### ✅ Runtime Monitoring (Hud.io)
-- Track AI code performance in production
-- Compare AI vs human code metrics
-- Error correlation & root cause analysis
-- Real-time alerting
+### ✅ Runtime observability
+- **Sentry** for production errors (configured on demo API)
+- Hud.io SDK on roadmap (waitlist)
 
 ### ✅ Developer Dashboard
 - Overview metrics & trends
@@ -148,8 +145,8 @@ print(f"Risks found: {len(result.risks)}")
 
 ### Sponsor Integrations
 
-#### Hud.io
-GuardRail uses Hud.io SDK for runtime monitoring of AI-generated code, tracking performance, errors, and exceptions in production.
+#### Sentry (runtime)
+Production API uses Sentry for error observability; see [`docs/OBSERVABILITAS_RUNTIME.md`](docs/OBSERVABILITAS_RUNTIME.md).
 
 #### Buildkite
 GuardRail integrates with Buildkite CI/CD to automatically scan code on every build and block merges when critical risks are detected.

@@ -1,6 +1,6 @@
 # Perintah umum GuardRail AI (jalankan dari root repo)
 
-.PHONY: help install lint test qa verify run-backend
+.PHONY: help install lint test qa verify eval run-backend
 
 help:
 	@echo "Perintah:"
@@ -8,6 +8,7 @@ help:
 	@echo "  make lint        - ruff check backend"
 	@echo "  make test        - pytest backend"
 	@echo "  make qa / verify - agensi QA (ruff + pytest + npm run build frontend bila ada node_modules)"
+	@echo "  make eval        - evaluasi deteksi AI (fixtures_eval_deteksi.json)"
 	@echo "  make run-backend - uvicorn reload (sesuaikan port di host Anda; ada bentrok pada :8000)"
 
 install:
@@ -23,6 +24,9 @@ verify: qa
 
 qa:
 	@bash scripts/agensi_verifikasi_qa.sh
+
+eval:
+	@backend/.venv/bin/python scripts/eval_deteksi.py
 
 run-backend:
 	cd backend && uvicorn src.main:app --reload --host 127.0.0.1 --port 8010
