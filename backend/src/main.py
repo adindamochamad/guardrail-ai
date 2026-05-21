@@ -4,10 +4,11 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from .config import dapatkan_pengaturan
+from .config import dapatkan_daftar_asal_cors, dapatkan_pengaturan
 from .database import BasisModel, dapatkan_sesi_db, mesin_database
 from .models import CodeFile, Scan  # noqa: F401 — memastikan metadata ORM terdaftar
 from .observabilitas import pasang_observabilitas_runtime, ringkas_status_observabilitas
@@ -29,8 +30,17 @@ pengaturan_aplikasi = dapatkan_pengaturan()
 
 app = FastAPI(
     title=pengaturan_aplikasi.nama_aplikasi,
-    version="0.5.0",
+    version="0.6.0",
     lifespan=lifespan,
+)
+
+# Dashboard web memanggil API dari browser (origin lain) — pakai middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=dapatkan_daftar_asal_cors(pengaturan_aplikasi),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(rute_deteksi.router)

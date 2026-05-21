@@ -90,6 +90,28 @@ class PengaturanAplikasi(BaseSettings):
         validation_alias="SENTRY_DEBUG_ROUTE",
         description="Jika true + DSN ada, mendaftarkan GET /sentry-debug (hanya untuk dev).",
     )
+    teks_asal_cors_opsional: str = Field(
+        default="",
+        validation_alias="CORS_ORIGINS",
+        description="Origin tambahan untuk CORS (pisahkan koma), contoh: https://app.contoh.com",
+    )
+
+
+def dapatkan_daftar_asal_cors(pengaturan: PengaturanAplikasi) -> list[str]:
+    """Gabung origin bawaan (dev Vite + dashboard statis produksi) dengan env CORS_ORIGINS."""
+
+    bawaan = [
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+        "https://guardrail.adindamochamad.com",
+    ]
+    ekstra = [
+        potong.strip()
+        for potong in pengaturan.teks_asal_cors_opsional.split(",")
+        if potong.strip()
+    ]
+    gabungan = bawaan + ekstra
+    return list(dict.fromkeys(gabungan))
 
 
 @lru_cache

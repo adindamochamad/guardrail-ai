@@ -17,5 +17,5 @@ alwaysApply: true
 - Satu `Base` declarative; metadata konsisten untuk `create_all` di lifespan dev.
 - Foreign key dengan `ondelete` yang eksplisit bila relasi kritis; cascade sesuai kebutuhan hackathon MVP.
 
-## Lint
-- Jalankan `ruff check src tests` dari folder `backend/` sebelum menganggap tugas selesai.
+## Lint & QA
+- Dari akar repo jalankan **`make qa`** (`scripts/agensi_verifikasi_qa.sh`) untuk ruff + pytest + build frontend; laporkan hasil eksplisit ke pengguna.

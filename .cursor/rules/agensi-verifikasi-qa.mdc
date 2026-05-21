@@ -1,0 +1,18 @@
+---
+description: Setelah menyentuh backend atau frontend GuardRail AI, jalankan agensi QA.
+alwaysApply: true
+---
+
+# Agensi QA & verifikator (human + otomatis)
+
+## Wajib sebelum Anda menutup tugas kode GuardRail AI
+
+Kontrak untuk **setiap giliran Anda** yang mengubah **`backend/`** atau **`frontend/`**:
+
+1. Jalankan **`make qa`** di root repo GuardRail AI, **atau** `bash scripts/agensi_verifikasi_qa.sh`.
+2. Pada ringkasan ke pengguna akhir, tulis **hasil QA** secara eksplisit: ✓ atau ✗ serta **nama langkah gagal** (ruff / pytest / `npm run build`).
+3. Jangan anggap selesai bila salah satu tahap gagal — perbaiki dulu atau jelaskan batasannya jika blokir luar kendali (misal `node_modules` belum ada di mesin Anda).
+
+Hook proyek (`.cursor/hooks.json`) memicu skrip QA pada event **`stop`**; tetap Anda **jalankan secara manual `make qa`** bila Hook tidak ada di lingkungan (CLI, sandbox, dll.).
+
+Detail & pemecahan masalah: [`docs/AGENSI_VERIFIKASI_QA.md`](docs/AGENSI_VERIFIKASI_QA.md).
