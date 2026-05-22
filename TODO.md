@@ -17,13 +17,13 @@ Versi backend: **v0.6.0**
 | A5 | Checklist Buildkite `docs/CHECKLIST_BUILDKITE.md` | [x] |
 | A6 | Perbaiki `guardrail_ci_scan.sh` (git safe.directory VPS) | [x] |
 | A7 | `make qa` hijau | [x] |
-| A8 | Commit + push ke GitHub | [ ] Anda / agent setelah review |
+| A8 | Commit + push ke GitHub | [x] |
 
 ### Fase B — Peluang menang hackathon ← **setelah Fase A**
 
 | # | Item | Status | Dampak |
 |---|------|--------|--------|
-| B1 | **Buildkite bukti nyata** — ikuti `CHECKLIST_BUILDKITE.md` (butuh token Anda) | [ ] | Sponsor Buildkite ↑↑ |
+| B1 | **Buildkite bukti nyata** — smoke + webhook backend selesai; UI Buildkite + `BUILDKITE_API_TOKEN` oleh Anda | [~] | Sponsor Buildkite ↑↑ |
 | B2 | **Submit Devpost** — salin `DEVPOST_DRAFT.md` + 5 screenshot + URL | [ ] | Progress ↑↑ |
 | B3 | **README** selaras (Sentry, `.venv`, tanpa klaim 85% palsu) | [x] |
 | B4 | Perluas eval / tuning ambang (opsional) | [ ] | Feasibility ↑ |
@@ -36,7 +36,7 @@ Versi backend: **v0.6.0**
 
 ## Fokus berikutnya (detail)
 
-- [ ] **Buildkite end-to-end** — lihat [`docs/CHECKLIST_BUILDKITE.md`](docs/CHECKLIST_BUILDKITE.md)
+- [~] **Buildkite end-to-end** — smoke + webhook backend: [`docs/BUKTI_BUILDKITE.md`](docs/BUKTI_BUILDKITE.md); UI + API token: Anda
 - [x] **Dataset eval mini** — [`scripts/eval_deteksi.py`](../scripts/eval_deteksi.py), [`docs/HASIL_EVAL_DETEKSI.md`](docs/HASIL_EVAL_DETEKSI.md) (bukan klaim 85%+)
 - [ ] **Metrik AI vs manusia** — backlog (persist scan atau agregat manual)
 - [x] **Draf Devpost** — [`docs/DEVPOST_DRAFT.md`](docs/DEVPOST_DRAFT.md); screenshot + submit oleh Anda

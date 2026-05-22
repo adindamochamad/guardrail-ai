@@ -1,0 +1,11 @@
+# Pipeline GuardRail — blokir build bila ada temuan CRITICAL (POST /scan).
+# Secret Buildkite wajib: GUARDRAIL_URL=https://guardrail-api.adindamochamad.com
+
+steps:
+  - label: ":shield: GuardRail — scan risiko (blokir jika CRITICAL)"
+    key: guardrail-scan
+    commands:
+      - echo "--- GuardRail CI scan"
+      - chmod +x scripts/guardrail_ci_scan.sh
+      - export GUARDRAIL_URL="${GUARDRAIL_URL:-https://guardrail-api.adindamochamad.com}"
+      - ./scripts/guardrail_ci_scan.sh
